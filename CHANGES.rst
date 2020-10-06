@@ -1,16 +1,288 @@
 Changelog
 =========
 
-0.9.16 (unreleased)
+.. You should *NOT* be adding new change log entries to this file.
+   You should create a file in the news directory instead.
+   For helpful instructions, please see:
+   https://github.com/plone/plone.releaser/blob/master/ADD-A-NEWS-ITEM.rst
+
+.. towncrier release notes start
+
+1.5.5 (2020-09-26)
+------------------
+
+Bug fixes:
+
+
+- Fixed error ``Variable '${CMFPLONE_SELECTORS}' not found`` on Plone 6.
+  [maurits] (#680)
+- Fixed DeprecationWarning: invalid escape sequence.
+  [maurits] (#3130)
+
+
+1.5.4 (2020-03-13)
+------------------
+
+Bug fixes:
+
+
+- Fixed package install error with Python 3.6 without locale.
+  See `coredev issue 642 <https://github.com/plone/buildout.coredev/issues/642#issuecomment-597008272>`_.
+  [maurits] (#642)
+
+
+1.5.3 (2019-11-25)
+------------------
+
+Bug fixes:
+
+
+- Fix the Debug keyword (#114)
+- Remove deprecation warnings [ale-rt] (#116)
+
+
+1.5.2 (2019-05-21)
+------------------
+
+Bug fixes:
+
+
+- Removed the legacy keyword ``Refresh JS/CSS resources``.
+  [Rotonen] (#110)
+- Use the 'Plone test setup' and 'Plone test teardown' keywords in the Robot tests.
+  [Rotonen] (#110)
+- Stabilize tests by defaulting to a browser window size of 4K x 4K.
+  [Rotonen] (#110)
+
+
+1.5.1 (2019-05-01)
+------------------
+
+Bug fixes:
+
+
+- Patch selenium.is_connectable for Python 3 to retry on ConnectionResetError.
+  See `issue 2786 <https://github.com/plone/Products.CMFPlone/issues/2786>`_.
+  [maurits] (#2786)
+
+
+1.5.0 (2019-02-08)
+------------------
+
+New features:
+
+
+- Print the ZServer and XMLRPC URLs when starting up the server. [jone] (#106)
+
+
+Bug fixes:
+
+
+- Remove five.globalrequest dependency. It has been deprecated upstream (Zope
+  4). [gforcada] (#95)
+- Fix old links on remote.py [gforcada] (#96)
+- Use the standard library signal module instead of the ZServer Signal module
+  [ale-rt] (#97)
+- Fix the travis build which is broken since we are picking a random port
+  (fixes #100) [ale-rt] (#100)
+- Do not raise an error if the child processes we want to kill is not there
+  anymore. Replace "Zope 2 server" with the more appropriate "Zope robot
+  server" [ale-rt] (#104)
+
+
+1.4.0 (2018-10-31)
+------------------
+
+New features:
+
+- Read files as binary in Python 3.
+  [davisagli]
+
+- Avoid test layer isolation problems by setting the remote library
+  as an attribute of the PloneSite class instead of a particular
+  portal instance.
+  [davisagli]
+
+
+1.3.1 (2018-10-31)
+------------------
+
+Breaking changes:
+
+- Default to the new plone.testing default of picking the ZServer port
+  dynamically.
+  [Rotonen]
+
+
+1.3.0 (2018-10-01)
+------------------
+
+New features:
+
+- Remove compatibility code for Plone 4.x.
+  [hvelarde]
+
+- Skip Support for Plone 4.x.
+  [jensens]
+
+Bug fixes:
+
+- Add support for Python 3.
+  [davisagli]
+
+- Support for Plone 5.x toolbar, i18n, ...
+  [jensens]
+
+- Fix RemoteLibrary ``i18n`` to work proper with registry based settings.
+  [jensens]
+
+- Make robotframework work with merged ``plone.login``.
+  [jensens]
+
+- Fix Travis CI setup.
+  [jensens]
+
+
+1.2.1 (2018-06-22)
+------------------
+
+Bug fixes:
+
+- Fixed create user with multiple roles with args::
+
+      Create user  siteadmin  Contributor  Reviewer  Site Administrator
+
+  and with kwargs::
+
+      @{roles} =  Create list  Contributor  Reviewer  Site Administrator
+      Create user  siteadmin  roles=@{roles}
+
+  [ksuess, datakurre]
+
+
+1.2.0 (2018-02-23)
+------------------
+
+New features:
+
+- Imports are Python3 compatible. Add six into install_requires set and sort
+  each file's imports with the isort package.
+  [b4oshany, @davilima6]
+
+
+1.1.3 (2018-02-02)
+------------------
+
+Bug fixes:
+
+- Import ``activatePluginInterfaces`` from ``Products.PlonePAS.setuphandlers``.
+  [maurits]
+
+
+1.1.2 (2018-01-30)
+------------------
+
+Bug fixes:
+
+- Use ``get_installer`` for checking if a product is installed.
+  Fall back to getting the ``portal_quickinstaller`` tool.
+  [maurits]
+
+
+1.1.1 (2017-06-28)
+------------------
+
+Bug fixes:
+
+- Update links to external documentation.  [jensens]
+
+
+1.1 (2017-04-08)
+----------------
+
+New features:
+
+- Add new variable ${SELENIUM2LIBRARY_RUN_ON_FAILURE} with default value
+  'No operation' (Robot Framework built-in keyword with no action) to define
+  operation immediately after failed Selenium keyword
+  [datakurre]
+
+Bug fixes:
+
+- Fix issue where an error "No keyword with name 'No keyword' found." after
+  a failing test was reported
+  [datakurre]
+
+
+1.0.3 (2017-03-28)
+------------------
+
+New features:
+
+- Manage datetime and date field types in "set field value" keyword
+  [sgeulette]
+
+- Manage RelationList field using "references" field type in "set field value" keyword
+  [sgeulette]
+
+
+1.0.2 (2017-02-22)
+------------------
+
+Bug fixes:
+
+- Fix issue where custom pybot-entrypoint failed to parse Sphinx-document with :ref:
+  [datakurre]
+
+
+1.0.1 (2016-09-08)
+------------------
+
+Bug fixes:
+
+- fix broken links
+  [staeff]
+
+
+1.0 (2016-07-15)
+----------------
+
+Breaking changes:
+
+- Do not use ``run_on_failure`` from ``Selenium2Library``.  This
+  interferes with ``Wait until keyword succeeds``: an initial failure
+  is seen as total failure instead of checking the retries of this
+  keyword.  See https://github.com/plone/Products.CMFPlone/pull/1652
+  [maurits]
+
+
+0.9.17 (2016-07-15)
 -------------------
 
-Incompatibilities:
+New features:
 
-- *add item here*
+- Test with robotframework version 3.0.   [maurits]
 
-New:
+- Added ``Plone Test Setup`` and ``Plone Test Teardown`` keywords.  In
+  that last one, in case of a failure do what is done by
+  ``run_on_failure``, which will be removed in version 1.0.  This
+  means a screen shot by default, but you can override this on the
+  command line with for example ``ROBOT_SELENIUM_RUN_ON_FAILURE=Debug``.
+  See https://github.com/plone/Products.CMFPlone/pull/1652
+  [maurits]
 
-- *add item here*
+- Add ``Running tests with the Google Chrome browser`` section.
+  Briefly: ``ROBOT_BROWSER=chrome ./bin/test --all``
+  [thet]
+
+Bug fixes:
+
+- Replaced deprecated ``Fail Unless Equal`` with ``Should Be Equal``
+  in test.  [maurits]
+
+
+0.9.16 (2016-06-07)
+-------------------
 
 Fixes:
 

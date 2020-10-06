@@ -1,12 +1,12 @@
 *** Settings ***
 
-Resource  plone/app/robotframework/selenium.robot
 Resource  plone/app/robotframework/saucelabs.robot
+Resource  plone/app/robotframework/selenium.robot
 
 Library  Remote  ${PLONE_URL}/RobotRemote
 
-Test Setup  Open SauceLabs test browser
-Test Teardown  Run keywords  Report test status  Close all browsers
+Test Setup  Run keywords  Plone test setup
+Test Teardown  Run keywords  Plone test teardown
 
 *** Test Cases ***
 
@@ -49,7 +49,7 @@ Test path to uid resolving
     ${uid} =  Create content  type=Document  id=example-document
     ...  title=Example document
     ${result_uid} =  Path to UID  /plone/example-document
-    Fail unless equal  ${uid}  ${result_uid}
+    Should Be Equal  ${uid}  ${result_uid}
 
 Test fire transition
     Enable autologin as  Contributor  Reviewer

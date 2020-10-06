@@ -12,6 +12,7 @@
 - Godefroid Chapelle
 - Hector Velarde
 - Jean-Michel Francois
+- Jens Klein
 - Johan Beyers
 - Johannes Raggam
 - Jonas Baumann
@@ -22,6 +23,7 @@
 - Roman Kozlovskyi
 - Silvio Tomatis
 - Steffen Lindner
+- Stephan Geulette
 - Timo Stollenwerk
 - Victor Fernandez de Alba
 - zotya

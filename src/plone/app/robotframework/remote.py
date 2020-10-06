@@ -5,14 +5,14 @@ from plone.app.testing import (
     ploneSite
 )
 from plone.testing import Layer
+from Products.CMFPlone.Portal import PloneSite
 
 
 class RemoteLibrary(SimpleItem):
     """Robot Framework remote library base for Plone
 
-    http://robotframework.googlecode.com/hg/doc/userguide/RobotFrameworkUserGuide.html?r=2.7.7#remote-library-interface
-    http://robotframework.googlecode.com/hg/tools/remoteserver/robotremoteserver.py
-
+    http://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#remote-library-interface
+    https://github.com/robotframework/PythonRemoteServer/blob/master/src/robotremoteserver.py
     """
     def get_keyword_names(self):
         """Return names of the implemented keywords
@@ -24,7 +24,7 @@ class RemoteLibrary(SimpleItem):
             'get_keyword_documentation',
             'run_keyword'
         ])
-        names = filter(lambda x: x[0] != '_' and x not in blacklist, dir(self))
+        names = [x for x in dir(self) if x[0] != '_' and x not in blacklist]
         return names
 
     def get_keyword_arguments(self, name):
@@ -45,7 +45,7 @@ class RemoteLibrary(SimpleItem):
         result = {'error': '', 'return': ''}
         try:
             retval = func(*args, **kwargs)
-        except Exception, e:
+        except Exception as e:
             result['status'] = 'FAIL'
             result['error'] = str(e)
         else:
@@ -68,13 +68,10 @@ class RemoteLibraryLayer(Layer):
     def setUp(self):
         id_ = self.__name__.split(':')[-1]
         assert id_ not in globals(), "Conflicting remote library id: %s" % id_
-        globals()[id_] = type(id_, self.libraryBases, {})
-        with ploneSite() as portal:
-            portal._setObject(id_, globals()[id_]())
+        globals()[id_] = Remote = type(id_, self.libraryBases, {})
+        setattr(PloneSite, id_, Remote())
 
     def tearDown(self):
         id_ = self.__name__.split(':')[-1]
-        with ploneSite() as portal:
-            if id_ in portal.objectIds():
-                portal._delObject(id_)
+        delattr(PloneSite, id_)
         del globals()[id_]

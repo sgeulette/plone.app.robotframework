@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-import os
-
-from Products.CMFCore.utils import getToolByName
+from datetime import datetime
 from plone.app.robotframework.config import HAS_BLOBS
 from plone.app.robotframework.config import HAS_DEXTERITY
 from plone.app.robotframework.config import HAS_DEXTERITY_RELATIONS
@@ -9,6 +7,7 @@ from plone.app.robotframework.remote import RemoteLibrary
 from plone.app.robotframework.utils import disableCSRFProtection
 from plone.i18n.normalizer.interfaces import IURLNormalizer
 from plone.uuid.interfaces import IUUID
+from Products.CMFCore.utils import getToolByName
 from zope.component import ComponentLookupError
 from zope.component import getUtility
 from zope.component import queryUtility
@@ -16,6 +15,10 @@ from zope.component.hooks import getSite
 from zope.event import notify
 from zope.globalrequest import getRequest
 from zope.lifecycleevent import ObjectModifiedEvent
+
+import os
+import six
+
 
 if HAS_DEXTERITY:
     from plone.app.textfield.value import RichTextValue
@@ -90,8 +93,10 @@ class Content(RemoteLibrary):
             if portal_type in ('File', ) and 'file' not in kwargs:
                 pdf_file = os.path.join(
                     os.path.dirname(__file__), 'content', u'file.pdf')
+                with open(pdf_file, 'rb') as f:
+                    file_data = f.read()
                 value = NamedBlobFile(
-                    data=open(pdf_file, 'r').read(),
+                    data=file_data,
                     contentType='application/pdf',
                     filename=u'file.pdf'
                 )
@@ -106,8 +111,9 @@ class Content(RemoteLibrary):
         content = None
         if HAS_DEXTERITY:
             # The title attribute for Dexterity types needs to be unicode
-            if 'title' in kwargs and isinstance(kwargs['title'], str):
+            if 'title' in kwargs and isinstance(kwargs['title'], six.binary_type):
                 kwargs['title'] = kwargs['title'].decode('utf-8')
+                create_kwargs['title'] = create_kwargs['title'].decode('utf-8')
             from plone.dexterity.interfaces import IDexterityFTI
             from plone.dexterity.utils import createContentInContainer
             try:
@@ -136,10 +142,10 @@ class Content(RemoteLibrary):
                 if widget and name in kwargs:
                     if not IFromUnicode.providedBy(field):
                         value = kwargs[name]
-                    elif isinstance(kwargs[name], unicode):
+                    elif isinstance(kwargs[name], six.text_type):
                         value = kwargs[name]
                     else:
-                        value = unicode(str(kwargs[name]), 'utf-8',
+                        value = six.text_type(str(kwargs[name]), 'utf-8',
                                         errors='ignore')
                     converter = IDataConverter(widget)
                     dm = queryMultiAdapter((content, field), IDataManager)
@@ -173,12 +179,35 @@ class Content(RemoteLibrary):
                 value = int(value)
             if field_type == 'list':
                 value = eval(value)
+            if field_type.startswith('datetime'):
+                # field_type must begin with 'datetime'
+                # followed by optional format 'datetime%Y%m%d%H%M'
+                # without format: %Y%m%d%H%M is used
+                field_type = field_type[8:]
+                fmt = field_type and field_type or '%Y%m%d%H%M'
+                value = datetime.strptime(value, fmt)
+            if field_type.startswith('date'):
+                # field_type must begin with 'date'
+                # followed by optional format 'date%Y%m%d'
+                # without format: %Y%m%d is used
+                field_type = field_type[4:]
+                fmt = field_type and field_type or '%Y%m%d'
+                value = datetime.strptime(value, fmt).date()
             if field_type == 'reference' and HAS_DEXTERITY_RELATIONS:
                 results_referenced = pc.unrestrictedSearchResults(UID=value)
                 referenced_obj = results_referenced[0]._unrestrictedGetObject()
                 intids = getUtility(IIntIds)
                 referenced_obj_intid = intids.getId(referenced_obj)
                 value = RelationValue(referenced_obj_intid)
+            if field_type == 'references' and HAS_DEXTERITY_RELATIONS:
+                values = eval(value)
+                intids = getUtility(IIntIds)
+                value = []
+                for uid in values:
+                    results_referenced = pc.unrestrictedSearchResults(UID=uid)
+                    referenced_obj = results_referenced[0]._unrestrictedGetObject()
+                    referenced_obj_intid = intids.getId(referenced_obj)
+                    value.append(RelationValue(referenced_obj_intid))
             if field_type == 'text/html':
                 value = RichTextValue(
                     value,
@@ -189,16 +218,20 @@ class Content(RemoteLibrary):
             if field_type == 'file':
                 pdf_file = os.path.join(
                     os.path.dirname(__file__), 'content', u'file.pdf')
+                with open(pdf_file, 'rb') as f:
+                    file_data = f.read()
                 value = NamedBlobFile(
-                    data=open(pdf_file, 'r').read(),
+                    data=file_data,
                     contentType='application/pdf',
                     filename=u'file.pdf'
                 )
             if field_type == 'image':
                 image_file = os.path.join(
                     os.path.dirname(__file__), u'image.jpg')
+                with open(image_file, 'rb') as f:
+                    image_data = f.read()
                 value = NamedBlobImage(
-                    data=open(image_file, 'r').read(),
+                    data=image_data,
                     contentType='image/jpg',
                     filename=u'image.jpg'
                 )
@@ -259,7 +292,7 @@ def prefill_image_types(portal, kwargs):
 
 def random_image():
     import random
-    import StringIO
+    from six import BytesIO
     from PIL import Image
     from PIL import ImageDraw
 
@@ -276,7 +309,7 @@ def random_image():
     )
     del draw
 
-    result = StringIO.StringIO()
+    result = BytesIO()
     img.save(result, 'PNG')
     result.seek(0)
     return result

@@ -1,8 +1,9 @@
-from setuptools import setup
 from setuptools import find_packages
+from setuptools import setup
+
 import sys
 
-version = '0.9.16.dev0'
+version = '1.5.6.dev0'
 
 
 def indented(filename):
@@ -13,15 +14,29 @@ def indent(line):
     return '   ' + line
 
 
+def read(filename):
+    with open(filename) as myfile:
+        try:
+            return myfile.read()
+        except UnicodeDecodeError:
+            # Happens on one Jenkins node on Python 3.6,
+            # so maybe it happens for users too.
+            pass
+    # Opening and reading as text failed, so retry opening as bytes.
+    with open(filename, "rb") as myfile:
+        contents = myfile.read()
+        return contents.decode("utf-8")
+
+
 long_description = (
-    open('README.rst').read() +
+    read('README.rst') +
     '\n' +
     'Contributors\n'
     '============\n' +
     '\n' +
-    open('CONTRIBUTORS.rst').read() +
+    read('CONTRIBUTORS.rst') +
     '\n' +
-    open('CHANGES.rst').read()
+    read('CHANGES.rst')
 )
 
 
@@ -41,10 +56,9 @@ install_requires = [
     'Products.CMFCore',
     'Products.CMFPlone',
     'Products.MailHost',
-    'Products.PlonePAS',
+    'Products.PlonePAS >= 5.0.1',
     'Products.PluggableAuthService',
     'babel',
-    'five.globalrequest',
     'plone.app.testing',
     'plone.testing',
     'plone.uuid',
@@ -53,6 +67,7 @@ install_requires = [
     'robotsuite',  # not a direct dependency, but required for convenience
     'selenium',
     'setuptools',
+    'six',
     'zope.component',
     'zope.configuration',
     'zope.i18n',
@@ -65,7 +80,7 @@ if sys.version_info < (2, 7):
         'argparse',
         'decorator',   # required by r.selenium2library on Python 2.6.x
         'simplejson',  # required for SauceLabs-keywords on Python 2.6.x
-        ])
+    ])
 
 test_requires = [
     'plone.app.dexterity',
@@ -106,15 +121,18 @@ setup(
     description="Robot Framework testing resources for Plone",
     long_description=long_description,
     classifiers=[
+        "Development Status :: 5 - Production/Stable",
+        "License :: OSI Approved :: GNU General Public License (GPL)",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 2.6",
         "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
     ],
     keywords='robot automatic browser testing Plone',
     author='Asko Soukka',
     author_email='asko.soukka@iki.fi',
     url='https://github.com/plone/plone.app.robotframework/',
-    license='gpl',
+    license='GPL',
     packages=find_packages('src'),
     package_dir={'': 'src'},
     namespace_packages=['plone', 'plone.app'],

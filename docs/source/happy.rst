@@ -128,7 +128,8 @@ ending with ``.robot`` (and older ones with ``.txt``).
 
 The first test can be written anywhere in the filesystem.
 
-For example, a ``test_hello.robot``:
+
+For example, a ``test_hello.robot`` :
 
 .. code-block:: robotframework
 
@@ -137,9 +138,8 @@ For example, a ``test_hello.robot``:
     Force Tags  wip-not_in_docs
 
     Resource  plone/app/robotframework/selenium.robot
-
-    Test Setup  Open test browser
-    Test Teardown  Close all browsers
+    Test Setup  Plone test setup
+    Test Teardown  Plone test teardown
 
   *** Test Cases ***
 
@@ -167,12 +167,13 @@ Here is a more complicated example with some user keywords in action:
 
     Force Tags  wip-not_in_docs
 
+    Resource  plone/app/robotframework/saucelabs.robot
     Resource  plone/app/robotframework/selenium.robot
 
     Library  Remote  ${PLONE_URL}/RobotRemote
 
-    Test Setup  Open test browser
-    Test Teardown  Close all browsers
+    Test Setup  Plone test setup
+    Test Teardown  Plone test teardown
 
     *** Variables ***
 
@@ -300,6 +301,56 @@ Or exclude matching tests from being run:
    $ bin/test -t \!robot
 
 
+Running tests with a different browser
+--------------------------------------
+
+Our robot configuration uses Firefox to run robot tests per default.
+To change this, you can pass an environment variable to zope.testrunner script.
+Make sure, any necessary webdriver applications are installed along with your browser (Firefox until version 46 ships with one preinstalled).
+Run your tests like so::
+
+    ROBOT_BROWSER=BROWSER_CONFIG_NAME ./bin/test --all -m MODULE_TO_TEST
+
+The browser name is a configuration variable from Selenium2Library.
+The most important ones are::
+
+- android
+- chrome
+- firefox
+- internetexplorer
+- iphone
+- opera
+- phantomjs
+- safari
+
+For more information see: http://robotframework.org/Selenium2Library/Selenium2Library.html#Open%20Browser
+
+In case for Google Chrome, do the following:
+
+* Install the ``ChromeDriver`` from https://sites.google.com/a/chromium.org/chromedriver/
+  ChromeDriver needs to be accessible from your path.
+
+* Start the tests like so (An example testing the ``test_tinymce.robot`` test from ``Products.CMFPlone``)::
+
+    ROBOT_BROWSER=chrome ./bin/test --all -m Products.CMFPlone -t test_tinymce.robot
+
+
+.. note::
+    If you want to run the tests with a different Firefox version than already installed, you can do the following (this applies to Linux based Systems):
+
+    1) Download the required version from https://ftp.mozilla.org/pub/firefox/releases/
+
+    2) Unzip it in a folder
+
+    3) Modify the ``PATH`` environment variable in a terminal to include the firefox binary before any other, like so::
+
+        $ export PATH=/home/user/Desktop/firefox43:$PATH
+
+    4) Run the tests in the same terminal session, where the modified PATH applies::
+
+        $ ./bin/test --all -m Products.CMFPlone -t test_tinymce.robot
+
+
 How to write more tests
 -----------------------
 
@@ -312,7 +363,7 @@ At first, you should have a brief idea about the available keywords:
 * `Robot Framework built-in library documentation`__
 * `Robot Framework Selenium2Library documentation`__
 
-__ http://robotframework.googlecode.com/hg/doc/libraries/BuiltIn.html
+__ http://robotframework.org/robotframework/latest/libraries/BuiltIn.html
 __ http://rtomac.github.com/robotframework-selenium2library/doc/Selenium2Library.html
 
 Then, learn to use pause test execution to make it easier to figure out,
@@ -322,14 +373,14 @@ what to do next:
 
     *** Settings ***
 
-    Force Tags  wip-not_in_docs
+
 
     Resource  plone/app/robotframework/selenium.robot
 
     Library  Remote  ${PLONE_URL}/RobotRemote
 
-    Test Setup  Open test browser
-    Test Teardown  Close all browsers
+    Test Setup  Plone test setup
+    Test Teardown  Plone test teardown
 
     *** Test Cases ***
 
@@ -360,7 +411,7 @@ figure out what to do next.
 
       *** Settings ***
 
-      Force Tags  wip-not_in_docs
+
 
       ...
 

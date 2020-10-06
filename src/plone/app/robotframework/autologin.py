@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from Products.PlonePAS.Extensions.Install import activatePluginInterfaces
+from Products.PlonePAS.setuphandlers import activatePluginInterfaces
 from Products.PluggableAuthService.plugins import DomainAuthHelper
 from plone.app.robotframework.remote import RemoteLibrary
 from plone.app.robotframework.utils import disableCSRFProtection
@@ -36,7 +36,7 @@ class AutoLogin(RemoteLibrary):
             raise Exception(u"Autologin is not enabled")
         if len(self.acl_users.robot_login._domain_map) == 0:
             raise Exception(u"Autologin is not enabled")
-        domain_map_key = self.acl_users.robot_login._domain_map.keys()[0]
+        domain_map_key = list(self.acl_users.robot_login._domain_map.keys())[0]
         domain_map = self.acl_users.robot_login._domain_map[domain_map_key]
         domain_map[0]['username'] = username
         self.acl_users.robot_login._domain_map[domain_map_key] = domain_map

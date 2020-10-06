@@ -1,13 +1,13 @@
 *** Settings ***
 
-Resource  plone/app/robotframework/selenium.robot
 Resource  plone/app/robotframework/keywords.robot
 Resource  plone/app/robotframework/saucelabs.robot
+Resource  plone/app/robotframework/selenium.robot
 
 Library  Remote  ${PLONE_URL}/RobotRemote
 
-Test Setup  Run keywords  Open SauceLabs test browser
-Test Teardown  Run keywords  Report test status  Close all browsers
+Test Setup  Run keywords  Plone test setup
+Test Teardown  Run keywords  Plone test teardown
 
 *** Test Cases ***
 
@@ -50,7 +50,7 @@ I'm logged in as a '${ROLE}'
     Go to  ${PLONE_URL}
 
 I open the personal menu
-    Click link  css=#user-name
+    Click link  css=#portal-personaltools > a
 
 I see the Site Setup -link
     Element should be visible  css=#personaltools-plone_setup
@@ -65,7 +65,6 @@ I can add a new folder
     Add folder  New folder
     Go to  ${PLONE_URL}/new-folder
     Page should contain  New folder
-    Element should contain  css=.documentAuthor  Contributor
 
 I've created a test folder
     Enable autologin as  Contributor
@@ -74,7 +73,6 @@ I've created a test folder
     Add folder  Test folder
     Go to  ${PLONE_URL}/test-folder
     Page should contain  Test folder
-    Element should contain  css=.documentAuthor  Authenticated
 
 I'm logged in as an 'Authenticated'
     Enable autologin as  Authenticated
@@ -89,7 +87,6 @@ I can add a sub-folder
     Add folder  Sub folder
     Go to  ${PLONE_URL}/test-folder/sub-folder
     Page should contain  Sub folder
-    Element should contain  css=.documentAuthor  Authenticated
 
 Someone else has created a test folder
     Enable autologin as  Contributor
